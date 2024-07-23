@@ -4,6 +4,8 @@ const express     = require('express');
 const bodyParser  = require('body-parser');
 const expect      = require('chai').expect;
 const cors        = require('cors');
+const mongoose = require('mongoose');
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true, dbName: 'issue-tracker' });
 require('dotenv').config();
 
 const apiRoutes         = require('./routes/api.js');
@@ -16,7 +18,31 @@ app.use('/public', express.static(process.cwd() + '/public'));
 
 app.use(cors({origin: '*'})); //For FCC testing purposes only
 
-
+const issueSchema = new mongoose.Schema({
+    issue_title: {
+        type: String,
+        required: true
+    },
+    issue_text: {
+        type: String,
+        required: true
+    },
+    created_by: {
+      type: String,
+      required: true
+    },
+    open: {
+      type: Boolean,
+      required: true
+    },
+    status_text: {
+      type: String
+    }
+}, {timestamps: {
+  createdAt: created_on,
+  updatedAt: updated_on
+}}, {collection: 'issues'});
+let issue = mongoose.model('issue', issueSchema, 'issues') //Last parameter to save issues in 'issues' collection
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
