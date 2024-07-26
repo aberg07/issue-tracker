@@ -39,7 +39,9 @@ let project = mongoose.model('project', projectSchema);
 module.exports = function (app) {
 
   app.route('/api/issues/:project')
-    //TODO: Add support for filters in GET request
+    /*
+    TODO: Allow filters with GET request
+    */
     .get(async function (req, res){
       //Find the project being requested
       let projectQuery = await project.findOne({project_name: req.params.project});
@@ -128,9 +130,27 @@ module.exports = function (app) {
       }
     })
     
-    .delete(function (req, res){
-      let project = req.params.project;
-      
+    .delete(async function (req, res){
+      //If _id field is empty, return an error
+      if (req.body._id === '') res.json({error: "missing _id"});
+      //Else, look for the project name
+      let projectQuery = await project.findOne({project_name: req.params.project});
+      //If the project doesn't exist, return an error
+      if (projectQuery == null) res.json({error: "could not delete", _id: req.body._id});
+      let indexToDelete;
+      for (let i = 0; i < projectQuery.projects.length; i++) {
+        //If we find an issue with the _id requested, store the index in indexToDelete
+        if (projectQuery.projects[i]._id == req.body._id) {
+          indexToDelete = i;
+          break;
+        }
+        //Else if we have reached the end of the issue array and the issue with _id wasn't found, return an error
+        else if (i == projectQuery.projects.length-1) res.json({error: "could not delete", _id: req.body._id});
+      }
+      //Delete the issue at index we found
+      projectQuery.projects.splice(indexToDelete, 1);
+      await projectQuery.save();
+      res.json({result: "successfully deleted", _id: req.body._id})
     });
     
 };
