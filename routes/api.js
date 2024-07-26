@@ -62,7 +62,7 @@ module.exports = function (app) {
       }
       //If issue_title, issue_text, or created_by are missing, return an error
       if (req.body.issue_title == '' || req.body.issue_text == '' || req.body.created_by == '') {
-        res.json({error: "required field(s) missing"})
+        return res.json({error: "required field(s) missing"})
       }
       //Else go ahead and create the issue
       else {
@@ -89,7 +89,7 @@ module.exports = function (app) {
         //If there is one field with input, it is valid
         else if (Object.values(req.body)[i] !== '') break;
         //Else if we have checked all fields and there is no input, return an error
-        else if (i == Object.keys(req.body).length-1) res.json({
+        else if (i == Object.keys(req.body).length-1) return res.json({
           error: "no update field(s) sent",
           _id: req.body._id
         })
@@ -97,7 +97,7 @@ module.exports = function (app) {
       //Field has at least one input, proceed with looking for the project
       let projectQuery = await project.findOne({project_name: req.params.project})
       //If the project is not found, return an error
-      if (projectQuery == null) res.json({
+      if (projectQuery == null) return res.json({
         error: "could not update",
         _id: req.body._id
       });
@@ -107,7 +107,7 @@ module.exports = function (app) {
         if (projectQuery.projects[i]._id == req.body._id) issueToUpdate = projectQuery.projects[i];
       }
       //If the issue with inputted _id was not found, return an error
-      if (issueToUpdate == null) res.json({
+      if (issueToUpdate == null) return res.json({
         error: "missing _id",
         _id: req.body._id
       });
@@ -132,11 +132,11 @@ module.exports = function (app) {
     
     .delete(async function (req, res){
       //If _id field is empty, return an error
-      if (req.body._id === '') res.json({error: "missing _id"});
+      if (req.body._id === '') return res.json({error: "missing _id"});
       //Else, look for the project name
       let projectQuery = await project.findOne({project_name: req.params.project});
       //If the project doesn't exist, return an error
-      if (projectQuery == null) res.json({error: "could not delete", _id: req.body._id});
+      if (projectQuery == null) return res.json({error: "could not delete", _id: req.body._id});
       let indexToDelete;
       for (let i = 0; i < projectQuery.projects.length; i++) {
         //If we find an issue with the _id requested, store the index in indexToDelete
@@ -145,8 +145,9 @@ module.exports = function (app) {
           break;
         }
         //Else if we have reached the end of the issue array and the issue with _id wasn't found, return an error
-        else if (i == projectQuery.projects.length-1) res.json({error: "could not delete", _id: req.body._id});
+        else if (i == projectQuery.projects.length-1) return res.json({error: "could not delete", _id: req.body._id});
       }
+      console.log('test');
       //Delete the issue at index we found
       projectQuery.projects.splice(indexToDelete, 1);
       await projectQuery.save();
