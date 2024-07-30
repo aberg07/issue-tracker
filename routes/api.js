@@ -40,14 +40,32 @@ module.exports = function (app) {
 
   app.route('/api/issues/:project')
     /*
-    TODO: Allow filters with GET request
+    TODO: Return the created object along with timestamps and id when an issue is created
     */
     .get(async function (req, res){
       //Find the project being requested
       let projectQuery = await project.findOne({project_name: req.params.project});
       //If it doesn't exist, return an empty array
       if (projectQuery == null) res.json([]);
-      else res.json(projectQuery.projects);
+      else {
+        if (req.query) { //If the user has supplied a query we will look for projects with the values requested
+          let results = [];
+          let properties = Object.keys(req.query); //Grab keys of query to know which properties to match
+          let values = Object.values(req.query); //Grab values of query to compare them to db entries
+          for (let i = 0; i < projectQuery.projects.length; i++) {
+            let currentProject = projectQuery.projects[i]
+            for (let j = 0; j < properties.length; j++) {
+              if (currentProject[properties[j]] != values[j]) break; //If a project's value for a given key does not match, move on to comparing the next project
+              else if (j == properties.length-1) { //If we are at the end of the array of properties to compare and haven't broken, that means the project matches what the user is looking for and we can add it to the results
+                results.push(currentProject);
+              }
+            }
+          }
+          return res.json(results);
+        }
+        else return res.json(projectQuery.projects);
+        //res.json(projectQuery.projects);
+      }
     })
     
     .post(async function (req, res){
