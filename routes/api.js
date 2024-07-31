@@ -39,9 +39,6 @@ let project = mongoose.model('project', projectSchema);
 module.exports = function (app) {
 
   app.route('/api/issues/:project')
-    /*
-    TODO: Return the created object along with timestamps and id when an issue is created
-    */
     .get(async function (req, res){
       //Find the project being requested
       let projectQuery = await project.findOne({project_name: req.params.project});
@@ -69,6 +66,9 @@ module.exports = function (app) {
     })
     
     .post(async function (req, res){
+      /*
+      TODO: Return the created object along with timestamps and id when an issue is created
+      */
       let projectQuery = await project.findOne({project_name: req.params.project});
       //If the project being posted to doesn't exist, create it
       if (projectQuery == null) {
@@ -95,7 +95,8 @@ module.exports = function (app) {
         projectQuery = await project.findOne({project_name: req.params.project});
         projectQuery.projects.push(newIssue);
         await projectQuery.save();
-        res.json(newIssue);
+        //To return all issue fields as per project specs, return the last element of the issues array in db
+        res.json(projectQuery.projects[projectQuery.projects.length-1]);
       }
     })
     
