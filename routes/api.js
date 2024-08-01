@@ -57,9 +57,13 @@ module.exports = function (app) {
           for (let i = 0; i < projectQuery.projects.length; i++) {
             let currentProject = projectQuery.projects[i]
             for (let j = 0; j < properties.length; j++) {
-              //TODO: Fix filter checking so that filter can search issues by open status
-              if (currentProject[properties[j]] !== values[j]) break; //If a project's value for a given key does not match, move on to comparing the next project
-              else if (j == properties.length-1) { //If we are at the end of the array of properties to compare and haven't broken, that means the project matches what the user is looking for and we can add it to the results
+              //Open status is stored in DB as string, but the true/false sent in the form is a string. Therefore, if we are filtering by open status, we need to first convert the string to a boolean before comparing it
+              if (properties[j] === 'open') {
+                let boolValue = (values[j] === 'true');
+                if (currentProject[properties[j]] !== boolValue) break; //If a project's value for a given key does not match, move on to comparing the next project
+              }
+              else if (currentProject[properties[j]] !== values[j]) break; //If a project's value for a given key does not match, move on to comparing the next project
+              if (j == properties.length-1) { //If we are at the end of the array of properties to compare and haven't broken, that means the project matches what the user is looking for and we can add it to the results
                 results.push(currentProject);
               }
             }
@@ -173,7 +177,6 @@ module.exports = function (app) {
         //Else if we have reached the end of the issue array and the issue with _id wasn't found, return an error
         else if (i == projectQuery.projects.length-1) return res.json({error: "could not delete", _id: req.body._id});
       }
-      console.log('test');
       //Delete the issue at index we found
       projectQuery.projects.splice(indexToDelete, 1);
       await projectQuery.save();

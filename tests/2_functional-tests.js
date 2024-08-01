@@ -115,17 +115,17 @@ suite('Functional Tests', function() {
         done();
     })
   })
-  //#6 THOUGH IT SAYS IT PASSES IT DOESN'T ACTUALLY, APP CAN'T YET FILTER BY "OPEN" STATUS
+  //#6
   test("View issues on a project with multiple filters", (done) => {
     chai.request('http://localhost:3000')
     .keepOpen()
-    .get('/api/issues/apitest/?created_by=Mike&status=open&assigned_to=Joe')
+    .get('/api/issues/apitest/?created_by=Mike&open=false&assigned_to=Joe')
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
         assert.typeOf(res.body, 'array', 'API should respond with an array');
         for (let i = 0; i < res.body.length; i++) {
             assert.equal(res.body[i].created_by, 'Mike', 'Query should only return issues created by Mike');
-            assert.equal(res.body[i].status, 'open', 'Query should only return issues that are open');
+            assert.strictEqual(res.body[i].open, false, 'Query should only return issues that are closed (false)');
             assert.equal(res.body[i].assigned_to, 'Joe', 'Query should only return issues assigned to Joe');
         }
         done();
