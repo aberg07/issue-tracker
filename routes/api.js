@@ -5,22 +5,27 @@ const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGO_URI, { dbName: 'issue-tracker' });
 const issueSchema = new mongoose.Schema({
     issue_title: {
-        type: String,
+      type: String,
+      required: true
     },
     issue_text: {
-        type: String,
+      type: String,
+      required: true
     },
     created_by: {
       type: String,
+      required: true
     },
     assigned_to: {
-      type: String
+      type: String,
+      default: ''
     },
     open: {
       type: Boolean,
     },
     status_text: {
-      type: String
+      type: String,
+      default: ''
     }
 }, {timestamps: {
   createdAt: 'created_on',
@@ -52,7 +57,8 @@ module.exports = function (app) {
           for (let i = 0; i < projectQuery.projects.length; i++) {
             let currentProject = projectQuery.projects[i]
             for (let j = 0; j < properties.length; j++) {
-              if (currentProject[properties[j]] != values[j]) break; //If a project's value for a given key does not match, move on to comparing the next project
+              //TODO: Fix filter checking so that filter can search issues by open status
+              if (currentProject[properties[j]] !== values[j]) break; //If a project's value for a given key does not match, move on to comparing the next project
               else if (j == properties.length-1) { //If we are at the end of the array of properties to compare and haven't broken, that means the project matches what the user is looking for and we can add it to the results
                 results.push(currentProject);
               }
@@ -66,9 +72,6 @@ module.exports = function (app) {
     })
     
     .post(async function (req, res){
-      /*
-      TODO: Return the created object along with timestamps and id when an issue is created
-      */
       let projectQuery = await project.findOne({project_name: req.params.project});
       //If the project being posted to doesn't exist, create it
       if (projectQuery == null) {
@@ -96,11 +99,15 @@ module.exports = function (app) {
         projectQuery.projects.push(newIssue);
         await projectQuery.save();
         //To return all issue fields as per project specs, return the last element of the issues array in db
-        res.json(projectQuery.projects[projectQuery.projects.length-1]);
+        return res.json(projectQuery.projects[projectQuery.projects.length-1]);
       }
     })
     
     .put(async function (req, res){
+      if (req.body._id == '') return res.json({
+        error: "missing _id",
+        _id: req.body._id
+      });
       //First check that at least one update field has been filled in. If not, return an error
       for (let i = 0; i < Object.keys(req.body).length; i++) {
         //Ignore _id field as it is required
@@ -127,7 +134,7 @@ module.exports = function (app) {
       }
       //If the issue with inputted _id was not found, return an error
       if (issueToUpdate == null) return res.json({
-        error: "missing _id",
+        error: "could not update",
         _id: req.body._id
       });
       else {
