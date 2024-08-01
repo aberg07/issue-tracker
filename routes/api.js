@@ -114,12 +114,10 @@ module.exports = function (app) {
       });
       //First check that at least one update field has been filled in. If not, return an error
       for (let i = 0; i < Object.keys(req.body).length; i++) {
-        //Ignore _id field as it is required
-        if (Object.keys(req.body)[i] === '_id') continue;
-        //If there is one field with input, it is valid
-        else if (Object.values(req.body)[i] !== '') break;
+        //If there is at least one field with input that is not the _id field, it is valid
+        if (Object.values(req.body)[i] !== '' && Object.keys(req.body)[i] !== '_id') break;
         //Else if we have checked all fields and there is no input, return an error
-        else if (i == Object.keys(req.body).length-1) return res.json({
+        if (i == Object.keys(req.body).length-1) return res.json({
           error: "no update field(s) sent",
           _id: req.body._id
         })

@@ -137,7 +137,7 @@ suite('Functional Tests', function() {
     .keepOpen()
     .put('/api/issues/apitest')
     .send({
-        _id: '66a3406f6c4d17e7765c6278',
+        _id: '66ab160cf83dee6d2f104866',
         issue_title: '',
         issue_text: '',
         created_by: '',
@@ -147,7 +147,7 @@ suite('Functional Tests', function() {
     })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.equal(res.body, {result: 'successfully updated', _id: '66a3406f6c4d17e7765c6278'});
+        assert.deepEqual(res.body, {result: 'successfully updated', _id: '66ab160cf83dee6d2f104866'});
     })
     done();
   })
@@ -157,7 +157,7 @@ suite('Functional Tests', function() {
     .keepOpen()
     .put('/api/issues/apitest')
     .send({
-        _id: '66a3406f6c4d17e7765c6278',
+        _id: '66ab160cf83dee6d2f104866',
         issue_title: 'Fix documentation typos',
         issue_text: 'We need to fix these typos.',
         created_by: 'Bob',
@@ -167,7 +167,7 @@ suite('Functional Tests', function() {
     })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.equal(res.body, {result: 'successfully updated', _id: '66a3406f6c4d17e7765c6278'})
+        assert.deepEqual(res.body, {result: 'successfully updated', _id: '66ab160cf83dee6d2f104866'})
     })
     done();
   })
@@ -177,6 +177,7 @@ suite('Functional Tests', function() {
     .keepOpen()
     .put('/api/issues/apitest')
     .send({
+        _id: '',
         issue_title: 'Fix documentation typos',
         issue_text: 'We need to fix these typos.',
         created_by: 'Bob',
@@ -186,7 +187,7 @@ suite('Functional Tests', function() {
     })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.equal(res.body, {error: 'missing _id', _id: res.body._id});
+        assert.deepEqual(res.body, {error: 'missing _id', _id: res.body._id});
     })
     done();
   })
@@ -195,10 +196,10 @@ suite('Functional Tests', function() {
     chai.request('http://localhost:3000')
     .keepOpen()
     .put('/api/issues/apitest')
-    .send({_id: '66a3406f6c4d17e7765c6278'})
+    .send({_id: '66ab160cf83dee6d2f104866'})
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.equal(res.body, {error: 'no update field(s) sent', _id: '66a3406f6c4d17e7765c6278'});
+        assert.deepEqual(res.body, {error: 'no update field(s) sent', _id: '66ab160cf83dee6d2f104866'});
     })
     done();
   })
@@ -218,7 +219,7 @@ suite('Functional Tests', function() {
     })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.equal(res.body, {error: "could not update", _id: req.body._id});
+        assert.deepEqual(res.body, {error: "could not update", _id: 'banana'});
     })
     done();
   })
@@ -228,11 +229,11 @@ suite('Functional Tests', function() {
     .keepOpen()
     .delete('/api/issues/apitest')
     .send({
-        _id: '66aaf6306890477a33373c39'
+        _id: '66ab170f497706a359ce7cd0'
     })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.equal(res.body, {result: 'successfully deleted', _id: req.body._id});
+        assert.deepEqual(res.body, {result: 'successfully deleted', _id: '66ab170f497706a359ce7cd0'});
     })
     done();
   })
@@ -246,7 +247,7 @@ suite('Functional Tests', function() {
     })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.equal(res.body, {error: 'could not delete', _id: req.body._id});
+        assert.deepEqual(res.body, {error: 'could not delete', _id: 'apple'});
     })
     done();
   })
@@ -255,9 +256,12 @@ suite('Functional Tests', function() {
     chai.request('http://localhost:3000')
     .keepOpen()
     .delete('/api/issues/apitest')
+    .send({
+        _id: ''
+    })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.equal(res.body, {error: 'missing _id'});
+        assert.deepEqual(res.body, {error: 'missing _id'});
     })
     done();
   })
