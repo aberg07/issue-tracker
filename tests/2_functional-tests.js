@@ -67,9 +67,6 @@ suite('Functional Tests', function() {
     .keepOpen()
     .post('/api/issues/apitest')
     .send({
-        issue_title: "",
-        issue_text: "",
-        created_by: "",
         assigned_to: 'this should fail',
         status_text: 'due to missing required fields'
     })
@@ -177,7 +174,6 @@ suite('Functional Tests', function() {
     .keepOpen()
     .put('/api/issues/apitest')
     .send({
-        _id: '',
         issue_title: 'Fix documentation typos',
         issue_text: 'We need to fix these typos.',
         created_by: 'Bob',
@@ -187,7 +183,7 @@ suite('Functional Tests', function() {
     })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.deepEqual(res.body, {error: 'missing _id', _id: res.body._id});
+        assert.deepEqual(res.body, {error: 'missing _id'});
     })
     done();
   })
@@ -256,9 +252,6 @@ suite('Functional Tests', function() {
     chai.request('http://localhost:3000')
     .keepOpen()
     .delete('/api/issues/apitest')
-    .send({
-        _id: ''
-    })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
         assert.deepEqual(res.body, {error: 'missing _id'});

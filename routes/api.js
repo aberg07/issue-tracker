@@ -1,5 +1,7 @@
 'use strict';
 
+//TODO: Rewrite code so that it passes tests when certain fields are not sent AT ALL (i.e. return errors when fields are NULL, not just blank)
+
 require('dotenv').config();
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGO_URI, { dbName: 'issue-tracker' });
@@ -85,8 +87,12 @@ module.exports = function (app) {
         });
         await newProject.save();
       }
+      //Checking if issue_title, issue_text, or created_by are null, and setting them to blank to determine missing fields if not
+      let title = req.body.issue_title ?? '';
+      let issue = req.body.issue_text ?? '';
+      let created_by = req.body.created_by ?? '';
       //If issue_title, issue_text, or created_by are missing, return an error
-      if (req.body.issue_title == '' || req.body.issue_text == '' || req.body.created_by == '') {
+      if (title == '' || issue == '' || created_by == '') {
         return res.json({error: "required field(s) missing"})
       }
       //Else go ahead and create the issue
@@ -108,9 +114,11 @@ module.exports = function (app) {
     })
     
     .put(async function (req, res){
-      if (req.body._id == '') return res.json({
-        error: "missing _id",
-        _id: req.body._id
+      //Checking if _id field is null, setting it to blank if so
+      let _id = req.body._id ?? '';
+      //If _id is missing, return an error
+      if (_id === '') return res.json({
+        error: "missing _id"
       });
       //First check that at least one update field has been filled in. If not, return an error
       for (let i = 0; i < Object.keys(req.body).length; i++) {
@@ -159,8 +167,9 @@ module.exports = function (app) {
     })
     
     .delete(async function (req, res){
+      let _id = req.body._id ?? '';
       //If _id field is empty, return an error
-      if (req.body._id === '') return res.json({error: "missing _id"});
+      if (_id === '') return res.json({error: "missing _id"});
       //Else, look for the project name
       let projectQuery = await project.findOne({project_name: req.params.project});
       //If the project doesn't exist, return an error
