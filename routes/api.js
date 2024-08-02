@@ -37,7 +37,7 @@ const projectSchema = new mongoose.Schema({
   project_name: {
     type: String
   },
-  projects: {
+  issues: {
     type: [issueSchema]
   }
 }, {collection: 'projects'})
@@ -52,12 +52,12 @@ module.exports = function (app) {
       //If it doesn't exist, return an empty array
       if (projectQuery == null) res.json([]);
       else {
-        if (Object.keys(req.query).length > 0) { //If the user has supplied a query we will look for projects with the values requested
+        if (Object.keys(req.query).length > 0) { //If the user has supplied a query we will look for issues with the values requested
           let results = [];
           let properties = Object.keys(req.query); //Grab keys of query to know which properties to match
           let values = Object.values(req.query); //Grab values of query to compare them to db entries
-          for (let i = 0; i < projectQuery.projects.length; i++) {
-            let currentProject = projectQuery.projects[i]
+          for (let i = 0; i < projectQuery.issues.length; i++) {
+            let currentProject = projectQuery.issues[i]
             for (let j = 0; j < properties.length; j++) {
               //Open status is stored in DB as string, but the true/false sent in the form is a string. Therefore, if we are filtering by open status, we need to first convert the string to a boolean before comparing it
               if (properties[j] === 'open') {
@@ -72,7 +72,7 @@ module.exports = function (app) {
           }
           return res.json(results);
         }
-        else return res.json(projectQuery.projects);
+        else return res.json(projectQuery.issues);
       }
     })
     
@@ -82,7 +82,7 @@ module.exports = function (app) {
       if (projectQuery == null) {
         let newProject = new project({
           project_name: req.params.project,
-          projects: []
+          issues: []
         });
         await newProject.save();
       }
@@ -105,10 +105,10 @@ module.exports = function (app) {
           status_text: req.body.status_text
         };
         projectQuery = await project.findOne({project_name: req.params.project});
-        projectQuery.projects.push(newIssue);
+        projectQuery.issues.push(newIssue);
         await projectQuery.save();
         //To return all issue fields as per project specs, return the last element of the issues array in db
-        return res.json(projectQuery.projects[projectQuery.projects.length-1]);
+        return res.json(projectQuery.issues[projectQuery.issues.length-1]);
       }
     })
     
@@ -138,8 +138,8 @@ module.exports = function (app) {
       });
       //Else, start looking for issue to update
       let issueToUpdate;
-      for (let i = 0; i < projectQuery.projects.length; i++) {
-        if (projectQuery.projects[i]._id == req.body._id) issueToUpdate = projectQuery.projects[i];
+      for (let i = 0; i < projectQuery.issues.length; i++) {
+        if (projectQuery.issues[i]._id == req.body._id) issueToUpdate = projectQuery.issues[i];
       }
       //If the issue with inputted _id was not found, return an error
       if (issueToUpdate == null) return res.json({
@@ -174,17 +174,17 @@ module.exports = function (app) {
       //If the project doesn't exist, return an error
       if (projectQuery == null) return res.json({error: "could not delete", _id: req.body._id});
       let indexToDelete;
-      for (let i = 0; i < projectQuery.projects.length; i++) {
+      for (let i = 0; i < projectQuery.issues.length; i++) {
         //If we find an issue with the _id requested, store the index in indexToDelete
-        if (projectQuery.projects[i]._id == req.body._id) {
+        if (projectQuery.issues[i]._id == req.body._id) {
           indexToDelete = i;
           break;
         }
         //Else if we have reached the end of the issue array and the issue with _id wasn't found, return an error
-        else if (i == projectQuery.projects.length-1) return res.json({error: "could not delete", _id: req.body._id});
+        else if (i == projectQuery.issues.length-1) return res.json({error: "could not delete", _id: req.body._id});
       }
       //Delete the issue at index we found
-      projectQuery.projects.splice(indexToDelete, 1);
+      projectQuery.issues.splice(indexToDelete, 1);
       await projectQuery.save();
       res.json({result: "successfully deleted", _id: req.body._id})
     });
