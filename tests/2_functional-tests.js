@@ -225,11 +225,11 @@ suite('Functional Tests', function() {
     .keepOpen()
     .delete('/api/issues/apitest')
     .send({
-        _id: '66ac69e01eb874799af31024'
+        _id: '66ac6a8dfea9ce58ebd58575'
     })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.deepEqual(res.body, {result: 'successfully deleted', _id: '66ac69e01eb874799af31024'});
+        assert.deepEqual(res.body, {result: 'successfully deleted', _id: '66ac6a8dfea9ce58ebd58575'});
     })
     done();
   })

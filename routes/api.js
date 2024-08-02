@@ -64,7 +64,7 @@ module.exports = function (app) {
                 let boolValue = (values[j] === 'true');
                 if (currentProject[properties[j]] !== boolValue) break; //If a project's value for a given key does not match, move on to comparing the next project
               }
-              else if (currentProject[properties[j]] !== values[j]) break; //If a project's value for a given key does not match, move on to comparing the next project
+              else if (currentProject[properties[j]] != values[j]) break; //If a project's value for a given key does not match, move on to comparing the next project
               if (j == properties.length-1) { //If we are at the end of the array of properties to compare and haven't broken, that means the project matches what the user is looking for and we can add it to the results
                 results.push(currentProject);
               }
