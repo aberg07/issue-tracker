@@ -1,7 +1,5 @@
 'use strict';
 
-//TODO: Rewrite code so that it passes tests when certain fields are not sent AT ALL (i.e. return errors when fields are NULL, not just blank)
-
 require('dotenv').config();
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGO_URI, { dbName: 'issue-tracker' });

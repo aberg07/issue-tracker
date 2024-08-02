@@ -134,7 +134,7 @@ suite('Functional Tests', function() {
     .keepOpen()
     .put('/api/issues/apitest')
     .send({
-        _id: '66ac69e01eb874799af3101a',
+        _id: '66ac6b93fa4c83982febf6fb',
         issue_title: '',
         issue_text: '',
         created_by: '',
@@ -144,7 +144,7 @@ suite('Functional Tests', function() {
     })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.deepEqual(res.body, {result: 'successfully updated', _id: '66ac69e01eb874799af3101a'});
+        assert.deepEqual(res.body, {result: 'successfully updated', _id: '66ac6b93fa4c83982febf6fb'});
     })
     done();
   })
@@ -154,7 +154,7 @@ suite('Functional Tests', function() {
     .keepOpen()
     .put('/api/issues/apitest')
     .send({
-        _id: '66ac69e01eb874799af3101a',
+        _id: '66ac6b93fa4c83982febf6fb',
         issue_title: 'Fix documentation typos',
         issue_text: 'We need to fix these typos.',
         created_by: 'Bob',
@@ -164,7 +164,7 @@ suite('Functional Tests', function() {
     })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.deepEqual(res.body, {result: 'successfully updated', _id: '66ac69e01eb874799af3101a'})
+        assert.deepEqual(res.body, {result: 'successfully updated', _id: '66ac6b93fa4c83982febf6fb'})
     })
     done();
   })
@@ -192,10 +192,10 @@ suite('Functional Tests', function() {
     chai.request('http://localhost:3000')
     .keepOpen()
     .put('/api/issues/apitest')
-    .send({_id: '66ac69e01eb874799af3101a'})
+    .send({_id: '66ac6b93fa4c83982febf6fb'})
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.deepEqual(res.body, {error: 'no update field(s) sent', _id: '66ac69e01eb874799af3101a'});
+        assert.deepEqual(res.body, {error: 'no update field(s) sent', _id: '66ac6b93fa4c83982febf6fb'});
     })
     done();
   })
@@ -225,11 +225,11 @@ suite('Functional Tests', function() {
     .keepOpen()
     .delete('/api/issues/apitest')
     .send({
-        _id: '66ac6a8dfea9ce58ebd58575'
+        _id: '66ac6d6c545e2aa557d8fb7d'
     })
     .end((err, res) => {
         assert.equal(res.status, 200, 'Status should be 200 (OK)');
-        assert.deepEqual(res.body, {result: 'successfully deleted', _id: '66ac6a8dfea9ce58ebd58575'});
+        assert.deepEqual(res.body, {result: 'successfully deleted', _id: '66ac6d6c545e2aa557d8fb7d'});
     })
     done();
   })
