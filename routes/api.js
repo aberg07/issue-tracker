@@ -52,7 +52,7 @@ module.exports = function (app) {
       //If it doesn't exist, return an empty array
       if (projectQuery == null) res.json([]);
       else {
-        if (req.query) { //If the user has supplied a query we will look for projects with the values requested
+        if (Object.keys(req.query).length > 0) { //If the user has supplied a query we will look for projects with the values requested
           let results = [];
           let properties = Object.keys(req.query); //Grab keys of query to know which properties to match
           let values = Object.values(req.query); //Grab values of query to compare them to db entries
@@ -73,7 +73,6 @@ module.exports = function (app) {
           return res.json(results);
         }
         else return res.json(projectQuery.projects);
-        //res.json(projectQuery.projects);
       }
     })
     
